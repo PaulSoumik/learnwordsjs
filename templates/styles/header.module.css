@@ -1,0 +1,26 @@
+.header_container{
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #000;
+}
+.header_nav{
+    display:flex;
+}
+.header_nav_item{
+    list-style: none;
+    display: block;
+    padding: 0.3rem;
+    padding-left: 1rem;
+    
+}
+.header_nav_item a{
+    color: black;
+    text-decoration: none;
+}
+
+.header_title{
+    padding: 0.3rem;
+    padding-left: 1rem;
+    align-self: center;
+    color: #dc3545;
+}

@@ -1,0 +1,30 @@
+.section_header{
+    display: flex;
+    justify-content: space-between;
+}
+.section_show_hide_btn{
+    align-self: center;
+    transform: rotateZ(90deg);
+    cursor: pointer;
+    transition-duration: 10ms;
+}
+.section_body{
+    height: 0px;
+    overflow: hidden;
+    transition-duration: 10s;
+}
+.section_container{
+    font-size: small;
+    border-top: 1px solid #000;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+}
+.section_title{
+    font-size: medium;
+}
+.section_body_active{
+    height: unset;
+}
+.secton_list_item_clickable{
+    cursor: pointer;
+}
