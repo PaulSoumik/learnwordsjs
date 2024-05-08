@@ -3,7 +3,8 @@ const wordsStaticText = {
     synonyms: 'Synonyms',
     previous: 'previous',
     next: 'next',
-    sentences: 'Sentences'
+    sentences: 'Sentences',
+    type: 'typ.'
 }
 
 export {wordsStaticText};
