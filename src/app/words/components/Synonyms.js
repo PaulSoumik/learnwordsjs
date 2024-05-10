@@ -4,7 +4,6 @@ import {wordsStaticText} from '../../../../staticText/staticText'
 import SubSection from '../../../../templates/SubSection'
 
 export default function SynonymsCmp({synonyms, handleWordClick}) {
-    console.log(synonyms);
     if(!synonyms || synonyms.length==0){
         return (<section></section>);
     }

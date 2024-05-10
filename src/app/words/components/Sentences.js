@@ -5,7 +5,6 @@ import {wordsStaticText} from '../../../../staticText/staticText'
 import SubSection from '../../../../templates/SubSection'
 
 export default function SentencesCmp({sentences}) {
-    console.log(sentences);
     if(!sentences || sentences.length==0){
         return (<section></section>);
     }

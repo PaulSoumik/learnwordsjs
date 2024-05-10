@@ -4,10 +4,10 @@ import SentencesCmp from './Sentences';
 import SynonymsCmp from './Synonyms';
 import {wordsStaticText} from '../../../../staticText/staticText'
 
-export default function WordCarousel({words}) {
+export default function WordCarousel({words, cookies}) {
     let wordData = [];
+    console.log(cookies);
     words.forEach((wrd,idx)=>{wordData.push(wrd)});
-    console.log('word carousel load', words);
     var handleSynWordClick = (event) =>{
         var slideId = event.currentTarget.getAttribute('data_id');
         var slide = document.getElementsByClassName(styles.carousel_container)[0].childNodes[words.get(slideId).slideIndex];

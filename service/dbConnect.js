@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import { dataTables } from '../models/dataModels';
 
 const { db } = require('@vercel/postgres');
 var client = null;
@@ -8,54 +9,28 @@ export async function dbConnect(){
 }
 
 
-
-/*const words = await fetchWords();
-  const synonyms = await fetchSynonyms();
-  const sentences = await fetchSentences();
-  
-  let wordData = [];//prepareWordData(words, synonyms, sentences);
-    {
-    id: {
-        word:'',
-        definition:'',
-        wordtype:'',
-        slideIndex:'',
-        Synonyms : [],
-        Sentences: []
+export async function rollBack(client, rollBackMap){
+    console.log(rollBackMap);
+    if(!client) client = await db.connect();
+    var dataDeleted = {};
+    if(rollBackMap[dataTables.users] && rollBackMap[dataTables.users].length==0){
+        dataDeleted.users = await client.sql`DELETE FROM users WHERE id in ${rollBackMap[dataTables.users]}`;
     }
-  }
-  words.map((word,index)=>{
-    wordData[word.id] = {
-      word: word.word,
-      definition: word.definition,
-      wordtype: word.wordtype,
-      slideIndex: index,
-      synonyms: [],
-      sentences: []
+    if(rollBackMap[dataTables.words] && rollBackMap[dataTables.words].length==0){
+        dataDeleted.words = await client.sql`DELETE FROM words WHERE id in ${rollBackMap[dataTables.words]}`;
     }
-  });
-
-  //Adding sysnonyms to each word if present
-  let synonymCheck = {};
-  synonyms.map(syn=>{
-    if(!syn.synonymto_id || !syn.synword_id) return;
-    if(synonymCheck[syn.synonymto_id+'_'+syn.synword_id] || synonymCheck[syn.synword_id+'_'+syn.synonymto_id]){
-      return;
+    if(rollBackMap[dataTables.synonyms] && rollBackMap[dataTables.synonyms].length==0){
+        dataDeleted.synonyms = await client.sql`DELETE FROM synonyms WHERE id in ${rollBackMap[dataTables.synonyms]}`;
     }
-    synonymCheck[syn.synonymto_id+'_'+syn.synword_id] = true;
-    wordData[syn.synonymto_id].synonyms.push({id:syn.synword_id, word: wordData[syn.synword_id].word});
-    wordData[syn.synword_id].synonyms.push({id:syn.synonymto_id, word: wordData[syn.synonymto_id].word});
-  });
-
-  //Adding sentences for each word
-  let sentenceCheck = {};
-  sentences.map(stnc=>{
-    if(sentenceCheck[stnc.id+'_'+stnc.word_id]){
-      return;
+    if(rollBackMap[dataTables.sentences] && rollBackMap[dataTables.sentences].length==0){
+        dataDeleted.sentences = await client.sql`DELETE FROM sentences WHERE id in ${rollBackMap[dataTables.sentences]}`;
     }
-    synonymCheck[stnc.id+'_'+stnc.word_id] = true;
-    wordData[stnc.word_id].sentences.push({id: stnc.id, sentence: stnc.sentence, wordId: stnc.word_id, word: wordData[stnc.word_id].word});
-  });
-  console.log('Data');
-  
-  console.log(wordData);*/
+    if(rollBackMap[dataTables.userwordrelations] && rollBackMap[dataTables.userwordrelations].length==0){
+        dataDeleted.userwordrelations = await client.sql`DELETE FROM userwordrelations WHERE id in ${rollBackMap[dataTables.userwordrelations]}`;
+    }
+    if(rollBackMap[dataTables.usersessions] && rollBackMap[dataTables.usersessions].length==0){
+        dataDeleted.usersessions = await client.sql`DELETE FROM users WHERE id in ${rollBackMap[dataTables.usersessions]}`;
+    }
+    console.log(dataDeleted);
+    return dataDeleted;
+}
