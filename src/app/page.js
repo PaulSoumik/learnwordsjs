@@ -1,9 +1,8 @@
 import Image from "next/image";
-import styles from "./page.module.css";
-import Header from "../../templates/Header";
-import { isUserSessionValid } from "../../service/UserSessionService";
+import Header from "../../common/Header";
+import { isUserSessionValid } from "../../service/dataService/UserSessionService";
 import { cookies } from "next/headers";
-import SignUpDirect from "../../templates/SignUpDirect";
+import SignUpDirect from "../../common/SignUpDirect";
 
 export default async function Home() {
   const isLoggerIn = cookies().get('sessionId')!=null;
@@ -11,16 +10,18 @@ export default async function Home() {
   
 
   return (
-    <main className={styles.body_container}>
-      <Header isLoggedIn={isLoggerIn}/>
-      <div className={styles.description}>
-        Test NextJs
-      </div>
-      {!isValidSession &&
-        <div>
-          <SignUpDirect isLoggedIn={isLoggerIn} isValidSession={isValidSession}/>
+    <main className='body_container'>
+      <Header isLoggedIn={isLoggerIn} isValidSession={isValidSession}/>
+      <div className="body_content">
+        <div className='description'>
+          Test NextJs
         </div>
-      }
+        {!isValidSession &&
+          <div>
+            <SignUpDirect isLoggedIn={isLoggerIn} isValidSession={isValidSession}/>
+          </div>
+        }
+      </div>
     </main>
   );
 }

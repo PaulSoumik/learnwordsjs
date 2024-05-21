@@ -1,33 +1,37 @@
 import Image from "next/image";
-import { fetchWords } from "../../../service/WordService";
 import WordCarousel from "./components/WordCarousel";
-import styles from "../page.module.css";
-import { getWordsUserDataAll } from "../../../service/UserWordsDataService";
-import Header from '../../../templates/Header'
+import styles from "./words.module.css";
+import { getWordsUserDataAll, getWordsUserData } from "../../../service/logicService/WordRelationController";
+import Header from '../../../common/Header'
 import { cookies } from "next/headers";
-import { isUserSessionValid } from "../../../service/UserSessionService";
-import SignUpDirect from "../../../templates/SignUpDirect";
+import { isUserSessionValid } from "../../../service/dataService/UserSessionService";
+import SignUpDirect from "../../../common/SignUpDirect";
+import { handlelogOutCookies } from "../../../serverAction/actionLogout";
 
 export default async function Words() {
   const isLoggerIn = cookies().get('sessionId')!=null;
-  
-  const words = await getWordsUserDataAll();
-  const isValidSession = cookies().get('useremail') && cookies().get('sessionId')? await isUserSessionValid(cookies().get('useremail').value,cookies().get('sessionId').value) : false;
-  
-  if(!words){
-    return (<section>Loading...</section>)
-  }
+  //const userEmail = cookies().get('useremail');
+  //console.log(userEmail);
+  //console.log('words page');
+  //console.log(cookies().getAll());
+  const isValidSession = cookies().get('useremail')!=null && cookies().get('sessionId')!=null? await isUserSessionValid(cookies().get('useremail').value,cookies().get('sessionId').value) : false;
+  //console.log('Validation words: '+ isValidSession);
+  const userEmail = cookies().get('useremail')!=null? cookies().get('useremail').value : null;
+  const words = await getWordsUserData(isValidSession, userEmail);
+
   return (
     <main className={styles.body_container}>
       <Header isLoggedIn={isLoggerIn} isValidSession={isValidSession}/>
-      {isValidSession && <div>
-        <WordCarousel words = {words} cookies={cookies().getAll()}/>
-      </div>}
-      {!isValidSession &&
-        <div>
-          <SignUpDirect isLoggedIn={isLoggerIn} isValidSession={isValidSession}/>
-        </div>
-      }
+      <div className="body_content">
+        {isValidSession && <div>
+          <WordCarousel words = {words} userEmail={cookies().get('useremail').value}/>
+        </div>}
+        {!isValidSession &&
+          <div>
+            <SignUpDirect isLoggedIn={isLoggerIn} isValidSession={isValidSession}/>
+          </div>
+        }
+      </div>
     </main>
   );
 }

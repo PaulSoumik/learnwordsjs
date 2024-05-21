@@ -1,7 +1,7 @@
 'use client'
 import styles from '../words.module.css';
-import {wordsStaticText} from '../../../../staticText/staticText'
-import SubSection from '../../../../templates/SubSection'
+import {wordsStaticText} from '../../../../static/staticText'
+import SubSection from '../../../../common/SubSection'
 
 export default function SynonymsCmp({synonyms, handleWordClick}) {
     if(!synonyms || synonyms.length==0){

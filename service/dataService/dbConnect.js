@@ -1,5 +1,5 @@
 import { sql } from '@vercel/postgres';
-import { dataTables } from '../models/dataModels';
+import { dataTables } from '../../models/dataModels';
 
 const { db } = require('@vercel/postgres');
 var client = null;
@@ -10,7 +10,7 @@ export async function dbConnect(){
 
 
 export async function rollBack(client, rollBackMap){
-    console.log(rollBackMap);
+    //console.log(rollBackMap);
     if(!client) client = await db.connect();
     var dataDeleted = {};
     if(rollBackMap[dataTables.users] && rollBackMap[dataTables.users].length==0){
@@ -31,6 +31,6 @@ export async function rollBack(client, rollBackMap){
     if(rollBackMap[dataTables.usersessions] && rollBackMap[dataTables.usersessions].length==0){
         dataDeleted.usersessions = await client.sql`DELETE FROM users WHERE id in ${rollBackMap[dataTables.usersessions]}`;
     }
-    console.log(dataDeleted);
+    //console.log(dataDeleted);
     return dataDeleted;
 }

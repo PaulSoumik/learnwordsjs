@@ -1,40 +1,27 @@
-.setences_container{
-    font-size: small;
-    font-family:Verdana, Geneva, Tahoma, sans-serif
-}
-.sentences_title{
-    font-size: medium;
-}
-
-.sentence_highlight{
-    color: #dc3545;
-}
-
-.body_container{
-    margin: 0;
-    padding: 0;
-  }
-
-
-
-
 /*Carousel*/
 .carousel_wrapper{
     display: block;
     flex-direction: row;
+    margin-bottom: 2rem;
+    height: fit-content;
 }
 
 .carousel_container{
     overflow: none;
-    min-width: 720px;
+    /*min-width: 720px;*/
+    padding: 2rem;
     height: fit-content;
+    width: 450px;
+    margin: auto;
+    -webkit-box-shadow: -5px 4px 63px -5px rgba(0,0,0,0.63);
+    -moz-box-shadow: -5px 4px 63px -5px rgba(0,0,0,0.63);
+    box-shadow: -5px 4px 63px -5px rgba(0,0,0,0.63);
 }
 .carousel_slide {
     align-self: center;
     display: none;
-    margin: 0 0rem;
-    padding: 1rem;
-    width: calc(100%-1rem);
+    margin: auto;
+    
     height: 90%;
 }
 .carousel_slide.Active{
@@ -47,11 +34,15 @@
     height: 210px;
     border-bottom: 1px solid #000;
 }
+.carousel_title_wrapper{
+    margin: auto 0 2rem 0;
+    width: fit-content;
+    
+    flex: 3;
+}
 .carousel_title{
-    margin: auto 0 2rem 0;;
     display: flex;
     color: #dc3545;
-    flex: 3;
 }
 .carousel_body{
     display: flex;
@@ -63,12 +54,12 @@
     color: #525252;
 }
 .carousel_body_button_container{
-    margin:auto 0 2rem 0;
+    margin:auto;
     width: 100%;
     flex: 1;
 }
 .carousel_next_prev_button_container{
-    display: flex;
+    display: unset;
     margin-left: auto;
     margin-right: 0;
     width: fit-content;
@@ -118,3 +109,47 @@
 .section_body_active{
     height: unset;
 }
+.sentence_highlight{
+    color: #dc3545;
+}
+
+
+.select_option_container select{
+        padding: 0.3rem;
+        color: white;
+        background-color: rgba(100, 100, 100, 0.4);
+        border: none;
+        border-radius: 0.436rem;
+
+}
+.select_option_container option{
+    padding: 0.3rem;
+    color: white;
+    background-color: rgba(100, 100, 100, 0.6);
+    border: none;
+    border-radius: 0.436rem;
+
+}
+
+@media (max-width: 700px) {
+
+    .carousel_slide {
+      width: 300px;
+    }
+    .carousel_body_button_container{
+        margin-bottom: 2rem;
+    }
+    .carousel_title{
+        flex: 2;
+    }
+  }
+  
+  /* Tablet and Smaller Desktop */
+  @media (min-width: 701px) and (max-width: 1120px) {
+    .carousel_slide {
+      width: 350px;
+    }
+    .carousel_container{
+        width: 350px;
+    }
+  }

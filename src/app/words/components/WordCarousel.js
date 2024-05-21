@@ -2,11 +2,13 @@
 import styles from '../words.module.css';
 import SentencesCmp from './Sentences';
 import SynonymsCmp from './Synonyms';
-import {wordsStaticText} from '../../../../staticText/staticText'
+import SetStatus from './SetStatus';
+import {wordsStaticText} from '../../../../static/staticText'
 
-export default function WordCarousel({words, cookies}) {
+export default function WordCarousel({words,userEmail}) {
     let wordData = [];
-    console.log(cookies);
+    console.log("userEmail");
+    console.log(userEmail);
     words.forEach((wrd,idx)=>{wordData.push(wrd)});
     var handleSynWordClick = (event) =>{
         var slideId = event.currentTarget.getAttribute('data_id');
@@ -43,9 +45,12 @@ export default function WordCarousel({words, cookies}) {
            
             <div className={styles.carousel_container}>
                 {wordData.map((word)=>{
-                   return (<div className={`${styles.carousel_slide}${word.slideIndex==0? ' '+styles.Active:''}`} key = {word.slideIndex} data_id = {word.slideIndex} data_word_id = {word.Id}>
+                   return (<div className={`${styles.carousel_slide}${word.slideIndex==0? ' '+styles.Active:''}`} key = {word.slideIndex} data_id = {word.slideIndex} data_word_id = {word.id}>
                         <div className={`${styles.carousel_title_container}`}>
-                            <h2 className={`${styles.carousel_title}`}>{word.word?.toUpperCase()}</h2>
+                            <div className={`${styles.carousel_title_wrapper}`}>
+                                <h2 className={`${styles.carousel_title}`}>{word.word?.toUpperCase()}</h2>
+                                <SetStatus activeStatus={word.userStatus.status} userRelId={word.userStatus.Id} wordId={word.id} userEmail={userEmail}/>
+                            </div>
                             <div className={`${styles.carousel_body_button_container}`}>
                                     <div className={styles.carousel_next_prev_button_container}>
                                         <div className={styles.carousel_prev}>

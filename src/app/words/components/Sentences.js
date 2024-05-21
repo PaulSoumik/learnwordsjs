@@ -1,8 +1,8 @@
 'use client'
 import styles from '../words.module.css';
 import parse from 'html-react-parser';
-import {wordsStaticText} from '../../../../staticText/staticText'
-import SubSection from '../../../../templates/SubSection'
+import {wordsStaticText} from '../../../../static/staticText'
+import SubSection from '../../../../common/SubSection'
 
 export default function SentencesCmp({sentences}) {
     if(!sentences || sentences.length==0){
