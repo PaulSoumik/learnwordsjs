@@ -20,8 +20,8 @@ export default async function Home() {
       <div className="body_content">
         {isValidSession && 
             <section>
-              <h5 className='thin_mid_font'>Hello, {username}</h5>
-              <div className='thin_small_font'>
+              <h5 className="thin_mid_font">Hello, {username}</h5>
+              <div className="thin_small_font">
                   Welcome to WordSafari, your ultimate destination for mastering the English language! Whether you're a beginner, an advanced learner, or someone looking to expand their vocabulary for professional growth, WordSafari offers a treasure trove of resources tailored to your needs.
 
                   <br/>
