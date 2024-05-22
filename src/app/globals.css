@@ -5,6 +5,18 @@ body{
   background-image: linear-gradient(90deg, #19163f, #10161f);
   color: white;
 }
+.thin_big_font{
+  font-weight: 200;
+  font-size: 1.6rem;
+}
+.thin_mid_font{
+  font-weight: 200;
+  font-size: 1.2rem;
+}
+.thin_small_font{
+  font-weight: 200;
+  font-size: 1rem;
+}
 .body_container{
   margin: 0;
   padding: 0;
@@ -19,4 +31,65 @@ body{
 }
 .body_content{
   padding: 2rem;
+}
+
+.flex_container{
+  display: flex;
+  padding: 2rem;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+.flex_container.grid-col-2-all{
+  flex-direction: row;
+  align-items: center;
+}
+.grid-col-2-all .flex-grid-item{
+  padding: 1rem;
+  box-sizing: border-box;
+  flex: 1;
+  max-width: 50%;
+  margin: auto;
+}
+.flex_container .flex-card{
+  border-radius: 0.432rem;
+  height: 225px;
+  min-height: 90%;
+  margin-left: 1rem;
+  -webkit-box-shadow: 20px 38px 59px 0px rgba(0,0,0,0.35);
+  -moz-box-shadow: 20px 38px 59px 0px rgba(0,0,0,0.35);
+  box-shadow: 20px 38px 59px 0px rgba(0,0,0,0.35);
+}
+.flex_container .flex-card .flex-card-title{
+  font-size: 1.3rem;
+  font-weight: 200;
+}
+.flex_container .flex-card .flex-card-description{
+  font-size: 1rem;
+  font-weight: 100;
+}
+#Inactive{
+  height: 0px;
+  overflow: hidden;
+}
+#Active{
+  height: unset;
+}
+@media (max-width: 768px) {
+
+  .grid-col-2-all .flex-grid-item{
+    flex: auto;
+    max-width: 90%;
+  }
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 769px) and (max-width: 1120px) {
+  .grid-col-2-all .flex-grid-item{
+    flex: 1 1 auto;  
+  }
+  .flex_container .flex-card{
+    margin-left: 1rem;
+    max-width:45%;
+  }
 }

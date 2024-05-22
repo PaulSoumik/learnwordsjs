@@ -34,3 +34,10 @@ export async function rollBack(client, rollBackMap){
     //console.log(dataDeleted);
     return dataDeleted;
 }
+
+export async function serverlog(logdata){
+    console.log(logdata);
+}
+export async function serverlog2(logdata1, logdata2){
+    console.log(logdata1, logdata2);
+}

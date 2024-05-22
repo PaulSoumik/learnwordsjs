@@ -5,6 +5,8 @@ import { signUpUser } from '../../../service/logicService/UserAuthenticationCont
 import { createUserWordRelation, updateUserWordRelation } from '../../../service/dataService/UserWordRelstionService';
 import { dbConnect } from '../../../service/dataService/dbConnect';
 import { getUser } from '../../../service/dataService/UserServices';
+import { updateWordStatus } from '../../../service/logicService/WordRelationController';
+import { revalidatePath } from 'next/cache';
 const bcrypt = require('bcrypt');
 
 export async function handleCreateNotes(formData,initialState){
@@ -26,61 +28,7 @@ export async function handleCreateNotes(formData,initialState){
     }
 }
 export async function handleUpdateStatus(userRelId, wordId, userEmail, status){
-    if(userRelId==null || status==null) return;
-    let noError = false;
-    let result = {
-        success: false,
-        data: null,
-        error: null
-    };
-    var res = {
-        success: false,
-        data: null,
-        error: null
-    };
-    try{
-        console.log('update status');
-        client = await dbConnect();
-        let userRelrec;
-        if(userRelId==null && userEmail==null) throw Error('Not enough data');
-        
-        if(userRelId==null){
-            const user = await getUser(userEmail);
-            if(user==null) throw Error('User not found');
-            userRelrec = {
-                word_id : wordId,
-                user_id : user.id,
-                status: status,
-                notes: null 
-            }
-            result = await createUserWordRelation(client, userRelrec);
-            if(result.success == false && result.data!=null){
-                userRelId = result.data.id;
-            }
-            res.success = result.success;
-            res.data= result.data;
-            res.error= result.error;
-        }
-        if(userRelId!=null){
-            userRelrec = {
-                id : userRelId,
-                status: status,
-                notes: null 
-            }
-            result = await updateUserWordRelation(client,userRelrec);
-            console.log(result);
-            noError = result.success;
-            res.success = result.success;
-            res.data= result.data;
-            res.error= result.error;
-        }
-    }catch(error){
-        console.log(error)
-        noError = false;
-        res.error= result.error;
-    } finally{
-        await client.end();
-    }
-    if(res.error!=null) throw Error(res.error);
-    return res;
+    var res = await updateWordStatus(userRelId, wordId, userEmail, status);
+    if(!res || !res.success) return;
+    revalidatePath('/words')
 }

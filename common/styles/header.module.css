@@ -33,4 +33,35 @@
     padding-left: 1rem;
     align-self: center;
     color: #dc3545;
+    font-size: 2rem;
 }
+.header_bread_crumb_mobile{
+    font-size: 2rem;
+    transform: scaleX(2);
+}
+.header_bread_crumb_mobile::before{
+    content: '-';
+    position: absolute;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 767px) {
+    .header_nav{
+        display:block;
+        padding: 0px;
+    }
+    .header_container{
+        display: block;
+        justify-content: space-between;
+        padding: 1rem;
+    }
+    .header_bread_crumb_mobile{
+        float: right;
+        margin-top: -2.5rem;
+    }
+    .header_nav_item_button{
+        width: fit-content;
+        padding: 0.5rem 1.5rem;
+        margin-top: 1rem;
+    }
+  }

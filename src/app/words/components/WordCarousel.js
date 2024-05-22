@@ -5,7 +5,7 @@ import SynonymsCmp from './Synonyms';
 import SetStatus from './SetStatus';
 import {wordsStaticText} from '../../../../static/staticText'
 
-export default function WordCarousel({words,userEmail}) {
+export default function WordCarousel({words,userEmail, handleUserWordStatusChange}) {
     let wordData = [];
     console.log("userEmail");
     console.log(userEmail);
@@ -49,7 +49,7 @@ export default function WordCarousel({words,userEmail}) {
                         <div className={`${styles.carousel_title_container}`}>
                             <div className={`${styles.carousel_title_wrapper}`}>
                                 <h2 className={`${styles.carousel_title}`}>{word.word?.toUpperCase()}</h2>
-                                <SetStatus activeStatus={word.userStatus.status} userRelId={word.userStatus.Id} wordId={word.id} userEmail={userEmail}/>
+                                <SetStatus handleUserWordStatusChange = {handleUserWordStatusChange} activeStatus={word.userStatus.status} userRelId={word.userStatus.Id} wordId={word.id} userEmail={userEmail}/>
                             </div>
                             <div className={`${styles.carousel_body_button_container}`}>
                                     <div className={styles.carousel_next_prev_button_container}>

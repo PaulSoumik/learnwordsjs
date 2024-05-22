@@ -26,6 +26,9 @@ var createUserWordRelation = async (client, userWordRel) => {
         
         userWordRel.status = !userWordRel.status ? 'new' : statusMap[userWordRel.status];
 
+        if(userWordRel.userId==null || userWordRel.wordId==null){
+            throw Error('Record can\'t be created without word_id or user_id');
+        }
         if(userWordRel.status!='notes'){
             const userWordRelations = await client.sql`
                 SELECT * FROM userwordrelations 
@@ -38,9 +41,6 @@ var createUserWordRelation = async (client, userWordRel) => {
             if(userWordRelations.rowsCount>0){
                 throw Error('Data already exists but not found');
             }
-        }
-        if(!userWordRel.userId || !userWordRel.wordId){
-            throw Error('Record can\'t be created without word_id or user_id');
         }
         const insertedUserWordRelation = await client.sql `
             INSERT INTO userwordrelations (word_id, user_id, status, notes, createdDate)
@@ -112,31 +112,37 @@ var fetchUserWordRelation = async (client, words, users) =>{
             isClientCreated = true;
         }
         //console.log(words);
-        //console.log(users);
+        console.log('fetch rel');
         if(!words || !users || words.length == 0 || users.length == 0){
             throw Error('User and words are required to fetch relation');
         }
         var wordIds=[];
+        var wordsToCheck = '(';
         words.map(item=>{
             if(item?.id==null) return;
             wordIds.push(item.id);
+            wordsToCheck+=`'${item.id}',`;
         })
+        wordsToCheck = wordsToCheck.slice(0,-1)+')';
         var userIds=[];
+        var usersToCheck = '(';
         users.map(item=>{
             if(item?.id==null) return;
             userIds.push(item.id);
+            usersToCheck+=`'${item.id}',`;
         })
+        usersToCheck = usersToCheck.slice(0,-1)+')';
+        console.log('fetch rel Ids', userIds, wordIds);
+
         //var statusesToCheck = userWordRel.status == 'notes'? ['notes'] : ['new','inreview','recheck','completed'];
-        const userWordRelations = await client.sql`
-                SELECT * FROM userwordrelations 
-                WHERE user_id in ${userIds} AND word_id in ${wordIds}
-                ORDER BY createdDate DESC`;
-        //console.log(userWordRelations);
-        res.data = userWordRelations.rows;
+        const query = `SELECT * FROM userwordrelations WHERE user_id IN ${usersToCheck} AND word_id IN ${wordsToCheck} ORDER BY createdDate DESC`;
+        const userWordRelationsData = await client.query(query);
+        console.log(userWordRelationsData);
+        res.data = userWordRelationsData.rows;
         res.success = true;
 
     } catch(error){
-        //console.log(error);
+        console.log(error);
         res.success = false;
         res.error = error;
     } finally{

@@ -56,12 +56,12 @@ var getUser = async (client, email) => {
             client = await dbConnect();
             isClientCreated = true;
         }
-        console.log('user get user');
+        console.log('user get user',email);
         //console.log(client);
-        if(!email) throw Error('Email can\'t be null');
+        if(email==null) throw Error('Email can\'t be null');
         const user = await client.sql`SELECT * FROM users WHERE email=${email}`;
         if(user?.rows==null || user?.rows.length==0) return null;
-        console.log('user found', user.rows[0]);
+        //console.log('user found', user.rows[0]);
         return user.rows[0];
     } catch (error) {
       console.error('Failed to fetch user:', error);
