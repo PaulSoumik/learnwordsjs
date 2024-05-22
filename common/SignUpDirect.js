@@ -8,7 +8,7 @@ export default function SignUpDirect({isLoggedIn, isValidSession}) {
     return (
         <section className={styles.signup_direct_container}>
             <div className={styles.signup_direct_text}>
-                Welcome to WordSafari, your ultimate destination for mastering the English language! Whether you're a beginner, an advanced learner, or someone looking to expand their vocabulary for professional growth, WordSafari offers a treasure trove of resources tailored to your needs.
+                Welcome to WordSafari, your ultimate destination for mastering the English language! Whether you&#39;re a beginner, an advanced learner, or someone looking to expand their vocabulary for professional growth, WordSafari offers a treasure trove of resources tailored to your needs.
 
                 <br/>
                 <h2 className={styles.signup_direct_why_title}>Why Choose WordSafari?</h2>

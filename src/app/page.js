@@ -15,14 +15,14 @@ export default async function Home() {
   
 
   return (
-    <main className='body_container'>
+    <main className="body_container">
       <Header isLoggedIn={isLoggerIn} isValidSession={isValidSession}/>
       <div className="body_content">
         {isValidSession && 
             <section>
               <h5 className="thin_mid_font">Hello, {username}</h5>
               <div className="thin_small_font">
-                  Welcome to WordSafari, your ultimate destination for mastering the English language! Whether you're a beginner, an advanced learner, or someone looking to expand their vocabulary for professional growth, WordSafari offers a treasure trove of resources tailored to your needs.
+                  Welcome to WordSafari, your ultimate destination for mastering the English language! Whether you&#39;re a beginner, an advanced learner, or someone looking to expand their vocabulary for professional growth, WordSafari offers a treasure trove of resources tailored to your needs.
 
                   <br/>
                   <h2 className="thin_big_font">Why Choose WordSafari?</h2>
