@@ -4,13 +4,14 @@ import { dataTables } from '../../models/dataModels';
 const { db } = require('@vercel/postgres');
 var client = null;
 export async function dbConnect(){
-    if(client==null)  client= await db.connect();
+    client= await db.connect();
     return client; 
 }
 
 
 export async function rollBack(client, rollBackMap){
     //console.log(rollBackMap);
+
     if(!client) client = await db.connect();
     var dataDeleted = {};
     if(rollBackMap[dataTables.users] && rollBackMap[dataTables.users].length==0){

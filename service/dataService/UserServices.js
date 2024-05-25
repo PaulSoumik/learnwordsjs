@@ -52,13 +52,17 @@ var saveUser = async (client, user, rollBackMap) =>{
 var getUser = async (client, email) => {
     var isClientCreated = false;
     try{
-        if(!client) {
+        console.log(client);
+        if(client==null || !client.hasExecuted) {
+            //if(client!=null) await client.end();
             client = await dbConnect();
             isClientCreated = true;
+            console.log(isClientCreated);
         }
         console.log('user get user',email);
-        //console.log(client);
         if(email==null) throw Error('Email can\'t be null');
+
+        console.log(client);
         const user = await client.sql`SELECT * FROM users WHERE email=${email}`;
         if(user?.rows==null || user?.rows.length==0) return null;
         //console.log('user found', user.rows[0]);

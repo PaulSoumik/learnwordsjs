@@ -1,0 +1,17 @@
+.container{
+    display: flex;
+}
+.progress_bar_container{
+    width: 200px;
+    height: 100px;
+    background-color: black;
+}
+
+.progress_bar{
+    width: 45%;
+    height:20px;
+    background: white;
+    display:block;
+    border-top-right-radius: 0.432rem;
+    border-bottom-right-radius: 0.432rem;
+}

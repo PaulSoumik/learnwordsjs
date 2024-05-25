@@ -106,14 +106,15 @@ var fetchUserWordRelation = async (client, words, users) =>{
         error: null
       };
     var isClientCreated = false;
+    console.log('fetchUserWordRelation');
     try{
-        if(!client) {
+        if(client==null || !client.hasExecuted) {
             client = await dbConnect();
             isClientCreated = true;
         }
         //console.log(words);
         console.log('fetch rel');
-        if(!words || !users || words.length == 0 || users.length == 0){
+        if(words==null || users==null || words.length == 0 || users.length == 0){
             throw Error('User and words are required to fetch relation');
         }
         var wordIds=[];
@@ -132,11 +133,11 @@ var fetchUserWordRelation = async (client, words, users) =>{
             usersToCheck+=`'${item.id}',`;
         })
         usersToCheck = usersToCheck.slice(0,-1)+')';
-        console.log('fetch rel Ids', userIds, wordIds);
+        //console.log('fetch rel Ids', userIds, wordIds);
 
         //var statusesToCheck = userWordRel.status == 'notes'? ['notes'] : ['new','inreview','recheck','completed'];
         const query = `SELECT * FROM userwordrelations WHERE user_id IN ${usersToCheck} AND word_id IN ${wordsToCheck} ORDER BY createdDate DESC`;
-        const userWordRelationsData = await client.query(query);
+        const userWordRelationsData = await client.query(query);//sql`SELECT * FROM userwordrelations WHERE user_id IN ${usersToCheck} AND word_id IN ${wordsToCheck} ORDER BY createdDate DESC`;
         console.log(userWordRelationsData);
         res.data = userWordRelationsData.rows;
         res.success = true;

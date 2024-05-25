@@ -1,16 +1,25 @@
-import { sql } from '@vercel/postgres';
+import { db, sql } from '@vercel/postgres';
 import { cache } from 'react'
 import { dbConnect } from './dbConnect';
 
 const activeStatus = ['new', 'inactive', 'active'];
-const fetchWords = cache(async ()=>{
+const fetchWords = cache(async (client)=>{
   //console.log('Entring fetch Words');
+  var isClientCreated = false;
+  if(client==null || !client.hasExecuted){
+    client = await dbConnect();//await dbConnect()
+    isClientCreated = true;
+  }
+  console.log(client);
   try {
-    const data = await sql`SELECT * FROM words`;
+    console.log('fetch words',client);
+    const data = await client.sql`SELECT * FROM words`;
     return data.rows;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch words data.');
+  }finally{
+    if(isClientCreated) await client.end();
   }
 });
 const updateWords = async (client, words)=>{

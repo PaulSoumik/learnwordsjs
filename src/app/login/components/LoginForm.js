@@ -13,11 +13,11 @@ export default function LoginForm() {
       <div className={styles.form_container}>
         <form action={handleLogin}>
             <div className={styles.form_input_container}>
-              <label for ='email'>Email</label>
+              <label htmlFor ='email'>Email</label>
               <input type="email" name="email" placeholder="Email" required />
             </div>
             <div className={styles.form_input_container}>
-              <label for ='password'>Password</label>
+              <label htmlFor ='password'>Password</label>
               <input type="password" name="password" placeholder="Password" required />
             </div>
             <button type="submit">Login &rarr;</button>

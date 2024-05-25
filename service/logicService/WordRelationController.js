@@ -82,11 +82,12 @@ const getWordsUserDataAll = async ()=>{
 }
 
 const getWordsUserData = async (isValidLoggedIn, userEmail) => { 
-    const words = await fetchWords();
-    const synonyms = await fetchSynonyms();
-    const sentences = await fetchSentences();
-    //console.log(userEmail);
     var client = await dbConnect();
+    const words = await fetchWords(client);
+    const synonyms = await fetchSynonyms(client);
+    const sentences = await fetchSentences(client);
+    //console.log(userEmail);
+    
     const user = userEmail? await  getUser(client, userEmail) : null;
     var userArr = [];
     if(user){
@@ -163,5 +164,59 @@ const updateWordStatus = async (userRelId, wordId, userEmail, status)=>{
     }
     return res;
 }
+Date.prototype.addDays = function(days) {
+  var date = new Date(this.valueOf());
+  date.setDate(date.getDate() + days);
+  return date;
+}
+const wordRefMap = {
+  'inreview': 'inreview',
+  'completed': 'completed',
+  'recheck': 'inrecheck',
+  'notes': 'notescreated',
+  'new': 'umarked',
+}
+const prepareDashboardData = (wordData, numwords) =>{
+  var preparedDashBoardData = {
+      inreview: 0,
+      completed: 0,
+      inrecheck: 0,
+      notescreated: 0,
+      umarked: 0,
+      notedcreatedinlast5days: 0,
+      wordscheckedinlast5days:0, 
+      totalwords: numwords
+  }
+  wordData.forEach(word=>{
+      preparedDashBoardData[wordRefMap[word.status]]+=1;
+      if(word.status=='notes' && new Date().addDays(-5).getTime()>new Date(word.creatddate).getTime()){
+          preparedDashBoardData['notedcreatedinlast5days']+=1;
+      }
+      if(word.status!='notes' && word.status!='new' && new Date().addDays(-5).getTime()>new Date(word.creatddate).getTime()){
+          preparedDashBoardData['wordscheckedinlast5days']+=1;
+      } 
+  })
+  preparedDashBoardData['unmarked'] = (numwords-(preparedDashBoardData['inreview']+preparedDashBoardData['completed']+preparedDashBoardData['inrecheck']));
+  return preparedDashBoardData;
+}
+const prepareWordRelationData = async (userEmail) => {
+  const client = await dbConnect();
+  //console.log(client)
+  try{
+    console.log('fetchWords');
+    const words = await fetchWords(client);
+    console.log('getUser');
+    const user = await getUser(client, userEmail);
+    console.log('wordRelationData');
+    const wordRelationData = await fetchUserWordRelation(client, words, [user]);
+    var preparedData = prepareDashboardData(wordRelationData.data, words.length)
+  }catch(err){
+    console.log(err);
+  }finally{
+    await client.end();
+  }
+  console.log(preparedData);
+  return preparedData;
+}
 
-export {getWordsUserData, getWordsUserDataAll, updateWordStatus};
+export {getWordsUserData, getWordsUserDataAll, updateWordStatus, prepareWordRelationData};

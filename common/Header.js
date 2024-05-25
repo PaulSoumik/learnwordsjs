@@ -42,7 +42,7 @@ export default function Header({isLoggedIn, isValidSession}) {
             <div className={styles.header_title}>
                 WordSafari
             </div>
-            {width<768 && <div className={styles.header_bread_crumb_mobile} onClick={toggleNav}>-</div>}
+            {width<768 && <div className={styles.header_bread_crumb_mobile} id=  {showNavMobile? 'display' : 'hide'} onClick={toggleNav}>-</div>}
             <ul className={styles.header_nav} id=  {showNavMobile? 'Active' : 'Inactive'}>
                 <li className={styles.header_nav_item}>
                     <Link href="/">Home</Link>
@@ -50,6 +50,9 @@ export default function Header({isLoggedIn, isValidSession}) {
                 <li className={styles.header_nav_item}>
                     <Link href="/words">words</Link>
                 </li>
+                {isValidSession && <li className={styles.header_nav_item}>
+                    <Link href="/dashboard">Dashboard</Link>
+                </li>}
                 {isValidSession && <li className={styles.header_nav_item}>
                     <Link href="/logout">log out</Link>
                 </li>}

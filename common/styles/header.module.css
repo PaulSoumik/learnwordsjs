@@ -39,6 +39,12 @@
     font-size: 2rem;
     transform: scaleX(2);
 }
+#hide{
+    display: none;
+}
+#display{
+    display: block;
+}
 .header_bread_crumb_mobile::before{
     content: '-';
     position: absolute;

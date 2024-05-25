@@ -7,31 +7,30 @@ import { cookies } from "next/headers";
 import { isUserSessionValid } from "../../../service/dataService/UserSessionService";
 import SignUpDirect from "../../../common/SignUpDirect";
 import { handlelogOutCookies } from "../../../serverAction/actionLogout";
+import WordsPage from "./components/WordPage";
+import { Suspense } from "react";
+import Loading from "../../../common/Loading";
 
 export const metadata = {
   title: 'WordSafari | Words',
 };
 
 export default async function Words() {
-  const isLoggerIn = cookies().get('sessionId')!=null;
-  //const userEmail = cookies().get('useremail');
-  //console.log(userEmail);
-  //console.log('words page');
-  //console.log(cookies().getAll());
-  //var res = await updateWordStatus(null, 'e6226ac1-6cb4-47c7-a098-b1ac7ff3612f', 'adminUser@yopmail.com','In Review');
-  //console.log('word rel creation',res);
-  const isValidSession = cookies().get('useremail')!=null && cookies().get('sessionId')!=null? await isUserSessionValid(cookies().get('useremail').value,cookies().get('sessionId').value) : false;
-  //console.log('Validation words: '+ isValidSession);
+  const sessionID = cookies().get('sessionId')!=null? cookies().get('sessionId').value : null;
+  const isLoggerIn = sessionID!=null;
   const userEmail = cookies().get('useremail')!=null? cookies().get('useremail').value : null;
-  const words = await getWordsUserData(isValidSession, userEmail);
-  //console.log(words);
+  const isValidSession = userEmail!=null && sessionID!=null? await isUserSessionValid(userEmail,sessionID) : false;
+  //const words = await getWordsUserData(isValidSession, userEmail);
+  //console.log(words); <WordCarousel words = {words} userEmail={cookies().get('useremail').value}/>
 
   return (
     <main className={styles.body_container}>
       <Header isLoggedIn={isLoggerIn} isValidSession={isValidSession}/>
       <div className="body_content">
         {isValidSession && <div>
-          <WordCarousel words = {words} userEmail={cookies().get('useremail').value}/>
+          <Suspense fallback={<Loading/>}>
+            <WordsPage isValidSession={isValidSession}/>
+          </Suspense>
         </div>}
         {!isValidSession &&
           <div>
