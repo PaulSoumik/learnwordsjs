@@ -3,7 +3,7 @@ import { fetchWords } from "../dataService/WordService";
 import { fetchSynonyms } from "../dataService/SynonymsService";
 import { fetchSentences } from "../dataService/SentencesService";
 import { cache } from 'react'
-import { createUserWordRelation, fetchUserWordRelation, updateUserWordRelation } from "../dataService/UserWordRelstionService";
+import { createUserWordRelation, deleteUserWordRelation, fetchUserWordRelation, updateUserWordRelation } from "../dataService/UserWordRelstionService";
 import { getUser } from "../dataService/UserServices";
 import { dbConnect, serverlog, serverlog2 } from "../dataService/dbConnect";
 
@@ -62,11 +62,12 @@ const prepareWordData = cache((words, synonyms, sentences, userWordRelations)=>{
 
   //Adding notes and word status
   userWordRelations?.map(usersRel=>{
-    if(usersRel.status=='notes' && wordData.get(usersRel.word_id)){
-      wordData.get(usersRel.word_id).push({id: usersRel.id, notes: usersRel.notes, status: usersRel.status, word: wordData.get(usersRel.word_id).word})
+    if(usersRel.status=='notes' && wordData.get(usersRel.word_id)!=null){
+      wordData.get(usersRel.word_id).userNotes.push({id: usersRel.id, notes: usersRel.notes, status: usersRel.status, word: wordData.get(usersRel.word_id).word})
     }
-    if(usersRel.status!='notes' && wordData.get(usersRel.word_id) && wordData.get(usersRel.word_id).userStatus==''){
-      wordData.get(usersRel.word_id).userStatus== {
+    if(usersRel.status!='notes' && wordData.get(usersRel.word_id)!=null){
+      console.log(usersRel);
+      wordData.get(usersRel.word_id).userStatus = {
         id : usersRel.id,
         status: usersRel.status
       };
@@ -86,15 +87,14 @@ const getWordsUserData = async (isValidLoggedIn, userEmail) => {
     const words = await fetchWords(client);
     const synonyms = await fetchSynonyms(client);
     const sentences = await fetchSentences(client);
-    //console.log(userEmail);
     
     const user = userEmail? await  getUser(client, userEmail) : null;
     var userArr = [];
     if(user){
       userArr.push(user);
     }
-    console.log(userArr);
     const userWordRelations = await fetchUserWordRelation(client,words,userArr);
+    console.log(userWordRelations);
     if(!isValidLoggedIn){
         words.slice(0,3);
     }
@@ -103,7 +103,7 @@ const getWordsUserData = async (isValidLoggedIn, userEmail) => {
 
 
 const updateWordStatus = async (userRelId, wordId, userEmail, status)=>{
-  if(status==null) return;
+    if(status==null) return;
     let noError = false;
     let result = {
         success: false,
@@ -118,7 +118,7 @@ const updateWordStatus = async (userRelId, wordId, userEmail, status)=>{
     var client;
     try{
         console.log('update status');
-        console.log(userEmail);
+        //console.log(userEmail);
         client = await dbConnect();
         let userRelrec;
         if(userRelId==null && userEmail==null) throw Error('Not enough data');
@@ -126,19 +126,20 @@ const updateWordStatus = async (userRelId, wordId, userEmail, status)=>{
         if(userRelId==null){
             const user = await getUser(client, userEmail);
             if(user==null) throw Error('User not found');
-            console.log(user);
+            
             userRelrec = {
                 wordId : wordId,
                 userId : user.id,
                 status: status,
                 notes: null 
             }
-            console.log('before create', userRelrec);
+            //console.log('before create', userRelrec);
             result = await createUserWordRelation(client, userRelrec);
-            console.log('after create');
+            //console.log('after create');
             if(result.success == false && result.data!=null){
                 userRelId = result.data.id;
             }
+            //console.log('updateWordStatus after createWordStatus',result);
             res.success = result.success;
             res.data= result.data;
             res.error= result.error;
@@ -149,7 +150,9 @@ const updateWordStatus = async (userRelId, wordId, userEmail, status)=>{
                 status: status,
                 notes: null 
             }
+            //console.log('before update', userRelrec);
             result = await updateUserWordRelation(client,userRelrec);
+            //console.log('after update', result);
             noError = result.success;
             res.success = result.success;
             res.data= result.data;
@@ -203,11 +206,11 @@ const prepareWordRelationData = async (userEmail) => {
   const client = await dbConnect();
   //console.log(client)
   try{
-    console.log('fetchWords');
+    //console.log('fetchWords');
     const words = await fetchWords(client);
-    console.log('getUser');
+    //console.log('getUser');
     const user = await getUser(client, userEmail);
-    console.log('wordRelationData');
+    //console.log('wordRelationData');
     const wordRelationData = await fetchUserWordRelation(client, words, [user]);
     var preparedData = prepareDashboardData(wordRelationData.data, words.length)
   }catch(err){
@@ -215,8 +218,76 @@ const prepareWordRelationData = async (userEmail) => {
   }finally{
     await client.end();
   }
-  console.log(preparedData);
+  //console.log(preparedData);
   return preparedData;
 }
 
-export {getWordsUserData, getWordsUserDataAll, updateWordStatus, prepareWordRelationData};
+
+const addNewNotes = async (wordId, userEmail, note)=>{
+  if(note==null) return;
+  let result = {
+      success: false,
+      data: null,
+      error: null
+  };
+  var client;
+  try{
+      console.log('update status');
+      //console.log(userEmail);
+      client = await dbConnect();
+      const user = await getUser(client, userEmail);
+      if(user==null) throw Error('User not found');
+          
+      let userRelrec = {
+          wordId : wordId,
+          userId : user.id,
+          status: 'Notes',
+          notes: note 
+      }
+      //console.log('before create', userRelrec);
+      let res = await createUserWordRelation(client, userRelrec);
+      console.log('after create', res);
+      if(res.success == false && res.data!=null){
+          throw Error('Data creation failed');
+      }
+      //console.log('updateWordStatus after createWordStatus',result);
+      result.success = res.success;
+      result.data= res.data;
+      result.error= res.error;
+  }catch(error){
+      console.log(error)
+      result.success = false;
+      result.error= error;
+  } finally{
+      if(client!=null) await client.end();
+  }
+  return result;
+}
+
+const deleteUserNotes = async (noteIdToDelete) =>{
+  if(noteIdToDelete==null) return;
+  let result = {
+      success: false,
+      data: null,
+      error: null
+  };
+  var client;
+  try{
+      console.log('update status');
+      //console.log(userEmail);
+      client = await dbConnect();
+      let userWordRel = {
+        id: noteIdToDelete
+      }
+      var res = await deleteUserWordRelation(client,userWordRel);
+      result.success = res.success;
+      result.data = res.data;
+  } catch(err){
+    result.error = err;
+  }finally{
+    if(client!=null) await client.end();
+  }
+  return result;
+}
+
+export {getWordsUserData, getWordsUserDataAll, updateWordStatus, prepareWordRelationData, addNewNotes, deleteUserNotes};

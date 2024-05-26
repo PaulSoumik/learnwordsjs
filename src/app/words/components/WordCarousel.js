@@ -4,12 +4,14 @@ import SentencesCmp from './Sentences';
 import SynonymsCmp from './Synonyms';
 import SetStatus from './SetStatus';
 import {wordsStaticText} from '../../../../static/staticText'
+import AddNotes from './AddNotes';
 
 export default function WordCarousel({words,userEmail, handleUserWordStatusChange}) {
     let wordData = [];
-    console.log("userEmail");
-    console.log(userEmail);
+    //console.log("userEmail");
+    console.log(wordData);
     words.forEach((wrd,idx)=>{wordData.push(wrd)});
+    console.log(userEmail);
     var handleSynWordClick = (event) =>{
         var slideId = event.currentTarget.getAttribute('data_id');
         var slide = document.getElementsByClassName(styles.carousel_container)[0].childNodes[words.get(slideId).slideIndex];
@@ -72,6 +74,9 @@ export default function WordCarousel({words,userEmail, handleUserWordStatusChang
 
                             <div>
                                 <SentencesCmp sentences={word.sentences}/>
+                            </div>
+                            <div>
+                                <AddNotes wordId={word.id} userEmail={userEmail} allnotes={word.userNotes}/>
                             </div>
                         </div>
                     </div>)

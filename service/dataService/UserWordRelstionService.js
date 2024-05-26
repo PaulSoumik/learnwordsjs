@@ -17,8 +17,9 @@ var createUserWordRelation = async (client, userWordRel) => {
         error: null
       };
     var isClientCreated = false;
+    var dataExists = false;
     try {
-        console.log('create relation');
+        //console.log('create relation');
         if(!client) {
             client = await dbConnect();
             isClientCreated = true;
@@ -29,26 +30,32 @@ var createUserWordRelation = async (client, userWordRel) => {
         if(userWordRel.userId==null || userWordRel.wordId==null){
             throw Error('Record can\'t be created without word_id or user_id');
         }
+        console.log('word relation details: ',userWordRel);
         if(userWordRel.status!='notes'){
             const userWordRelations = await client.sql`
                 SELECT * FROM userwordrelations 
                 WHERE user_id = ${userWordRel.userId} AND word_id = ${userWordRel.wordId} AND status != 'notes'
                 ORDER BY createdDate DESC`;
-            if(userWordRelations.rowsCount>0 && userWordRelations.rows.length>0){
+            console.log('word relation existing: ',userWordRelations.rowCount>0 && userWordRelations.rows.length>0);
+            if(userWordRelations.rowCount>0 && userWordRelations.rows.length>0){
                 res.data = userWordRelations.rows[0];
-                throw Error('Data already exists');
+                dataExists = true;
+                console.log('Data already exists');
             }
-            if(userWordRelations.rowsCount>0){
+            if(userWordRelations.rowsCount>0 && userWordRelations.rows.length==0){
                 throw Error('Data already exists but not found');
             }
         }
-        const insertedUserWordRelation = await client.sql `
+        if(!dataExists){
+            const insertedUserWordRelation = await client.sql `
             INSERT INTO userwordrelations (word_id, user_id, status, notes, createdDate)
             VALUES (${userWordRel.wordId}, ${userWordRel.userId},${userWordRel.status},${userWordRel.notes}, ${new Date()})
             ON CONFLICT (id) DO NOTHING;`;
-        if(insertedUserWordRelation.rowsCount==0) throw Error('data creation failed');
-        res.success =  true;
-        res.data = insertedUserWordRelation.rows;
+            if(insertedUserWordRelation.rowsCount==0) throw Error('data creation failed');
+            res.success =  true;
+            res.data = insertedUserWordRelation.rows;
+        }
+        
     } catch (error) {
         console.error('Database Error:', error);
         res.success =  false;
@@ -56,6 +63,7 @@ var createUserWordRelation = async (client, userWordRel) => {
     } finally{
         if(isClientCreated) await client.end();
     }
+    console.log('word relation result: ',res);
     return res;
 }
 var updateUserWordRelation = async (client,userWordRel) => {
@@ -72,7 +80,7 @@ var updateUserWordRelation = async (client,userWordRel) => {
             isClientCreated = true;
         }
         //if(userWordRel.id==NULL) throw Error('Missing required field id for update');
-        console.log('statusu',userWordRel.status);
+        //console.log('statusu',userWordRel.status);
         userWordRel.status = userWordRel.status && statusMap[userWordRel.status]!=null ? statusMap[userWordRel.status] : 'new' ;
         if(!userWordRel.id){
             throw Error('Record can\'t be updated without id');
@@ -106,14 +114,12 @@ var fetchUserWordRelation = async (client, words, users) =>{
         error: null
       };
     var isClientCreated = false;
-    console.log('fetchUserWordRelation');
+    //console.log('fetch rel',users, words);
     try{
         if(client==null || !client.hasExecuted) {
             client = await dbConnect();
             isClientCreated = true;
         }
-        //console.log(words);
-        console.log('fetch rel');
         if(words==null || users==null || words.length == 0 || users.length == 0){
             throw Error('User and words are required to fetch relation');
         }
@@ -133,12 +139,10 @@ var fetchUserWordRelation = async (client, words, users) =>{
             usersToCheck+=`'${item.id}',`;
         })
         usersToCheck = usersToCheck.slice(0,-1)+')';
-        //console.log('fetch rel Ids', userIds, wordIds);
-
         //var statusesToCheck = userWordRel.status == 'notes'? ['notes'] : ['new','inreview','recheck','completed'];
         const query = `SELECT * FROM userwordrelations WHERE user_id IN ${usersToCheck} AND word_id IN ${wordsToCheck} ORDER BY createdDate DESC`;
+        //console.log('rel query',query);
         const userWordRelationsData = await client.query(query);//sql`SELECT * FROM userwordrelations WHERE user_id IN ${usersToCheck} AND word_id IN ${wordsToCheck} ORDER BY createdDate DESC`;
-        console.log(userWordRelationsData);
         res.data = userWordRelationsData.rows;
         res.success = true;
 
@@ -149,7 +153,7 @@ var fetchUserWordRelation = async (client, words, users) =>{
     } finally{
         if(isClientCreated) await client.end();
     }
-    //console.log(res);
+    //console.log('relation res', res);
     return res;
 };
 
@@ -162,9 +166,10 @@ var deleteUserWordRelation = async (client, userWordRel) =>{
   };
   try{
       if(!client) {
-          client = await db.connect();
+          client = await dbConnect();
           isClientCreated = true;
       }
+      if(userWordRel.id==null) throw Error('Id is required to delete');
       const deletedUserWordRelaton = await client.sql`DELETE FROM userwordrelations WHERE id = ${userWordRel.id}`;
       //console.log(deletedUserWordRelaton);
       res.data = deletedUserWordRelaton.rows;

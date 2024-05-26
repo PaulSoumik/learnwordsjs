@@ -5,7 +5,7 @@ import { signUpUser } from '../../../service/logicService/UserAuthenticationCont
 import { createUserWordRelation, updateUserWordRelation } from '../../../service/dataService/UserWordRelstionService';
 import { dbConnect } from '../../../service/dataService/dbConnect';
 import { getUser } from '../../../service/dataService/UserServices';
-import { updateWordStatus } from '../../../service/logicService/WordRelationController';
+import { addNewNotes, deleteUserNotes, updateWordStatus } from '../../../service/logicService/WordRelationController';
 import { revalidatePath } from 'next/cache';
 const bcrypt = require('bcrypt');
 
@@ -31,4 +31,14 @@ export async function handleUpdateStatus(userRelId, wordId, userEmail, status){
     var res = await updateWordStatus(userRelId, wordId, userEmail, status);
     if(!res || !res.success) return;
     revalidatePath('/words')
+}
+export async function handleAddNotes(wordId, userEmail, note){
+    var res = await addNewNotes(wordId, userEmail, note);
+    if(!res || !res.success) return;
+    revalidatePath('/words')
+}
+export async function handleDeleteNote(noteId){
+    var res = await deleteUserNotes(noteId);
+    if(!res || !res.success) return;
+    revalidatePath('/words');
 }

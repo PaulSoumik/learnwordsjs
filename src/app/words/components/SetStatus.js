@@ -19,13 +19,13 @@ export default function SetStatus({handleUserWordStatusChange, activeStatus, use
     const [isStatusChange, setIsStatusChange] = useState(false);
     var statuses = ['New', 'In Review', 'Recheck','Completed']
     const isLoading = isFetching || isPending;
-    
-   console.log(activeStatus);
+
     const handleSelectionChange = async (e) => {
         e.preventDefault();
         console.log(e.target.value);
         console.log(e.target.value, userRelId, wordId, userEmail);
         setIsFetching(true);
+        setStatusValue(e.target.value);
         //var res = await handleUpdateStatus(userRelId, wordId, userEmail,e.target.value);
         //console.log('data',res)
         

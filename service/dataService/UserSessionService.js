@@ -23,21 +23,13 @@ var getUserSession = async (email) => {
 }
 var isUserSessionValid = async (email, sessionKey) => {
     try {
-     //console.log('validate user',email);
      const userSession = await getUserSession(email);
-     //console.log('got usersession:',userSession);
      if(!userSession)return false;
      let currDateTime = moment().utc();
      let validationExpiryTime = moment(userSession.validationend,'YYYY-MM-DD HH:MM:SS').utc(true);
-     //console.log(validationExpiryTime);
-     //console.log(currDateTime);
-     //console.log(userSession.validationend);
-
-     //console.log(currDateTime.isBefore(validationExpiryTime));
      if(currDateTime.isBefore(validationExpiryTime )){
         return await bcrypt.compare(userSession.sessionid, sessionKey);
      }
-     //console.log('session expired');
      return false;
     } catch (error) {
       console.error(error);

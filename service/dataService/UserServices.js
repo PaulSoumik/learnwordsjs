@@ -51,28 +51,24 @@ var saveUser = async (client, user, rollBackMap) =>{
 }
 var getUser = async (client, email) => {
     var isClientCreated = false;
+    var userData = null;
     try{
-        console.log(client);
         if(client==null || !client.hasExecuted) {
-            //if(client!=null) await client.end();
             client = await dbConnect();
             isClientCreated = true;
-            console.log(isClientCreated);
         }
         console.log('user get user',email);
         if(email==null) throw Error('Email can\'t be null');
 
-        console.log(client);
         const user = await client.sql`SELECT * FROM users WHERE email=${email}`;
         if(user?.rows==null || user?.rows.length==0) return null;
-        //console.log('user found', user.rows[0]);
-        return user.rows[0];
+        userData =  user.rows[0];
     } catch (error) {
       console.error('Failed to fetch user:', error);
     }finally{
         if(isClientCreated) await client.end();
     }
-    return null;
+    return userData;
   }
 var authenticateUser = async (client, user) =>{
     var isClientCreated = false;
@@ -84,21 +80,18 @@ var authenticateUser = async (client, user) =>{
         if(!user.email){
             throw Error('UserAuthenticate01');
         }
-        ////console.log(user.email);
         var dbUser = await getUser(client, user.email);
-        ////console.log(dbUser);
         if(!dbUser){
             throw Error('UserAuthenticate02');
         }
         const passwordsMatch = await bcrypt.compare(user.password, dbUser.password);
 
-        ////console.log(passwordsMatch);
+        
         if(isClientCreated) await client.end();
         return {
             user: passwordsMatch? dbUser : null,
         };
     }catch(err){
-        //console.log('Got error while adding user: '+err);
         if(isClientCreated) await client.end();
         throw err;
     }

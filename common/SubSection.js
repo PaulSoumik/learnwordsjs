@@ -2,7 +2,7 @@
 import styles from './styles/subsection.module.css';
 import parse from 'html-react-parser';
 
-export default function SubSection({data, title, isList, listItemOnClick}) {
+export default function SubSection({data, title, isList, listItemOnClick, buttonsEnabled}) {
     if(!data || data.length==0){
         return (<section></section>);
     }
@@ -32,7 +32,7 @@ export default function SubSection({data, title, isList, listItemOnClick}) {
             <div className={styles.section_body}>
                 {isList && data.map((listItem, index)=>{
                     
-                    return (<p className={listItemOnClick!=null?styles.secton_list_item_clickable : ''} key={!listItem.id?index : listItem.id} data_id = {!listItem.id?index : listItem.id} onClick={listItemOnClick!=null?listItemOnClick:null}>{parse(listItem.val)}</p>)
+                    return (<p className={listItemOnClick!=null?styles.secton_list_item_clickable : ''} key={!listItem.id?index : listItem.id} data_id = {!listItem.id?index : listItem.id} onClick={listItemOnClick!=null?listItemOnClick:null}>{parse(listItem.val)}{buttonsEnabled!=null && buttonsEnabled['delete']!=null? <button  onClick={buttonsEnabled['delete']} className={styles.subsection_delete_button} data_id={listItem.id}>delete</button> : ''}</p>)
                 })}
                 {!isList && data.map((listItem, index)=>{
                     return (<span className={listItemOnClick!=null?styles.secton_list_item_clickable : ''} key={!listItem.id?index : listItem.id} data_id = {!listItem.id?index : listItem.id} onClick={listItemOnClick!=null?listItemOnClick:null}>{parse(listItem.val)};</span>)

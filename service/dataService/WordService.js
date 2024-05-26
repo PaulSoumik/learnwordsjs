@@ -4,15 +4,12 @@ import { dbConnect } from './dbConnect';
 
 const activeStatus = ['new', 'inactive', 'active'];
 const fetchWords = cache(async (client)=>{
-  //console.log('Entring fetch Words');
   var isClientCreated = false;
   if(client==null || !client.hasExecuted){
     client = await dbConnect();//await dbConnect()
     isClientCreated = true;
   }
-  console.log(client);
   try {
-    console.log('fetch words',client);
     const data = await client.sql`SELECT * FROM words`;
     return data.rows;
   } catch (error) {

@@ -28,3 +28,13 @@
 .secton_list_item_clickable{
     cursor: pointer;
 }
+.subsection_delete_button{
+    width: fit-content;
+    margin: 1rem 0 0 auto;
+    padding: 0.2rem 0.4rem;
+    background-color: unset;
+    border: unset;
+    color: #dc3545;
+    cursor: pointer;
+    float: right;
+}
