@@ -10,7 +10,6 @@ const moment = require('moment');
 var saveUser = async (client, user, rollBackMap) =>{
     var isClientCreated = false;
     try{
-        //console.log(user);
         if(!client) {
             client = await db.connect();
             isClientCreated = true;
@@ -18,9 +17,8 @@ var saveUser = async (client, user, rollBackMap) =>{
         if(!user.email){
             throw Error('Email is reuired to register user');
         }
-        //console.log(user);
+        
         var userExisting = await getUser(client, user.email);
-        //console.log(userExisting);
         if(userExisting){
             throw Error('User with the same email already exists');
         }
@@ -30,7 +28,7 @@ var saveUser = async (client, user, rollBackMap) =>{
             VALUES (${user.name}, ${user.email}, ${hashedPassword})
             ON CONFLICT (id) DO NOTHING;`;
     
-        //console.log('Added user', insertedUser);
+        console.log('Added user', insertedUser);
         rollBackMap[dataTables.users] = [];
         insertedUser.rows.map(usr=>{
             rollBackMap[dataTables.users].push(usr.id);
@@ -43,8 +41,6 @@ var saveUser = async (client, user, rollBackMap) =>{
         };
     }catch(err){
         var rollingback =  await rollBack(client, rollBackMap);
-        //console.log('rolledBack', rollingback);
-        //console.log('Got error while adding user: '+err);
         if(isClientCreated) await client.end();
         throw err;
     }
@@ -73,8 +69,8 @@ var getUser = async (client, email) => {
 var authenticateUser = async (client, user) =>{
     var isClientCreated = false;
     try{
-        if(!client) {
-            client = await db.connect();
+        if(client==null) {
+            client = await dbConnect();
             isClientCreated = true;
         }
         if(!user.email){
@@ -92,6 +88,7 @@ var authenticateUser = async (client, user) =>{
             user: passwordsMatch? dbUser : null,
         };
     }catch(err){
+        console.log(err);
         if(isClientCreated) await client.end();
         throw err;
     }

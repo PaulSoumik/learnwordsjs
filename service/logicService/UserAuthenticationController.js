@@ -1,7 +1,7 @@
-import { dbConnect } from "../dataService/dbConnect";
+import { dbConnect, rollBack } from "../dataService/dbConnect";
 import { cookies } from 'next/headers';
-import {authenticateUser} from "../dataService/UserServices"; 
-import {generateSession} from "../dataService/UserSessionService";
+import {authenticateUser, getUser, saveUser} from "../dataService/UserServices"; 
+import {deleteOlderSessions, generateSession, getSession, getUserSession} from "../dataService/UserSessionService";
 const bcrypt = require('bcrypt');
 
 var loginUser = async (user) => {
@@ -36,15 +36,17 @@ var loginUser = async (user) => {
 
 var signUpUser = async (user, token) =>{
     if(!user) return;
-    if(!token || token!='myaminuserisreadyforregister') {
+    if(!token || token!=process.env.USER_SIGNUP_TOKEN) {
         throw Error('Invalid token blocking registration');
     }
+    let client = null;
     try{
         var rollBackMap = [];
-        const client = await dbConnect();
+        client = await dbConnect();
         const signUpUser = await saveUser(client, user, rollBackMap);
+        if(signUpUser==null || signUpUser.user==null) throw Error('User creation failed');
         rollBackMap = signUpUser.rollBackMap;
-        if(!signUpUser || !signUpUser.user) throw Error('User creation failed');
+        
         const sessionId = await generateSession(client, signUpUser.user);
         if(!sessionId || !sessionId.newSession || !sessionId.newSession.sessionid){
             throw Error('Session creation failed');
@@ -61,6 +63,7 @@ var signUpUser = async (user, token) =>{
             message: 'user logged in'
         };
     }catch(error){
+        if(client ==null) client = await dbConnect();
         var rollingback =  await rollBack(client, rollBackMap);
         return {
             rolledBack: rollingback,
@@ -69,4 +72,28 @@ var signUpUser = async (user, token) =>{
         };
     }
 }
-export {loginUser, signUpUser};
+
+var signOutUser = async (currUser)=>{
+    if(!currUser) return null;
+    let client = null;
+    try{
+        client = await dbConnect();
+        const user  =  await getUser(client, currUser.email);
+        if(user==null) throw Error('No user found');
+        const sessions = await getSession(client, user.id);
+        let sessionIds = [];
+        if(sessions.rowCount==0) return true;
+        sessions.rows.forEach(session => {
+            sessionIds.push(session.id);
+        });
+        const delSessions = await deleteOlderSessions(client, sessionIds);
+        if(delSessions==null || delSessions.rowCount == null || delSessions.rowCount==0) return false;
+        return true;
+    }catch(err){
+        console.log(err);
+    }finally{
+        await client.end()
+    }
+    return false;
+}
+export {loginUser, signUpUser, signOutUser};

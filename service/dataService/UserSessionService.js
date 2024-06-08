@@ -8,14 +8,12 @@ var getUserSession = async (email) => {
   try {
     
     const currUser = await client.sql`SELECT Id FROM users WHERE email = ${email}`;
-    //console.log('validate user',currUser);
     if(currUser?.rows==null || currUser.rows.length==0) return null;
     const currUserSession = await client.sql`SELECT * FROM usersessions WHERE user_id = ${currUser.rows[0].id} ORDER BY createdDate DESC`;
-    //console.log('validate user',currUserSession);
     if(currUserSession?.rows==null || currUserSession.rows.length == 0) return null;
     return currUserSession.rows[0];
   } catch (error) {
-    console.error('Database Error:', error);
+    console.error('getUserSession Error:', error);
     throw new Error('Failed to fetch session data.');
   } finally{
     await client.end();
@@ -38,17 +36,16 @@ var isUserSessionValid = async (email, sessionKey) => {
   }
 
 var generateSession = async (client, sessionUser) =>{
-  //console.log('generateSession');
   var isClientCreated = false;
   try{
       var sessionRef = sessionUser.id+ (Math.random())*25100;
       var sessionId = await bcrypt.hash(sessionRef.toString(), 10);
       if(!client) {
-          client = await db.connect();
+          client = await dbConnect();
           isClientCreated = true;
       }
       const userSessions = await getSession(client, sessionUser.id);
-      if(userSessions && userSessions.rows && userSessions.rowCount>0){
+      if(userSessions!=null && userSessions.rows!=null && userSessions.rowCount>0){
           var sessionIds = [];
           userSessions.rows.map(session=>{sessionIds.push(session.id)});
           const deletedSessions  = await deleteOlderSessions(client, sessionIds);
@@ -67,8 +64,9 @@ var generateSession = async (client, sessionUser) =>{
       }
 
   }catch(error){
-      //console.log(error);
-      throw error;
+    if(isClientCreated) await client.end();
+    console.log(error);
+    throw error;
   }
 }
 
@@ -79,13 +77,11 @@ var getSession = async (client, userId) =>{
           client = await db.connect();
           isClientCreated = true;
       }
-      //console.log(userId);
       const userSessions = await client.sql`SELECT * FROM usersessions WHERE user_id = ${userId} ORDER BY createdDate DESC`;
-      //console.log(userSessions);
       if(isClientCreated) await client.end();
       return userSessions;
   }catch(err){
-      //console.log(err);
+      console.log(err);
       if(isClientCreated) await client.end();
       throw err;
   }
@@ -94,20 +90,17 @@ var deleteOlderSessions = async(client, sessionIds)=>{
   var isClientCreated = false;
   try{
       if(!client) {
-          client = await db.connect();
+          client = await dbConnect();
           isClientCreated = true;
       }
-      //console.log(sessionIds);
       var sessionsToDelete = '(\''+sessionIds.join('\',\'')+'\')';
-      //console.log(sessionsToDelete);
       const deletedUserSessions = await client.query(`DELETE FROM usersessions WHERE id IN ${sessionsToDelete}`);
-      //console.log(deletedUserSessions);
       if(isClientCreated) await client.end();
       return {
           deletedUserSessions: deletedUserSessions
       }
   }catch(err){
-      //console.log(err);
+      console.log(err);
       if(isClientCreated) await client.end();
       throw err;
   }
